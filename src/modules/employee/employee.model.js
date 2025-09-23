@@ -1,6 +1,9 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../db/connectToDb.js";
-
+import sequelize from "../../db/connectToDb.js";
+import Role from '../role/role.model.js';
+import Department from '../dept/dept.model.js';
+import Location from '../location/location.model.js';
+import Asset from '../asset/asset.model.js';
 
 const Employee = sequelize.define("Employee", {
   emp_id: {
@@ -29,6 +32,10 @@ const Employee = sequelize.define("Employee", {
       isEmail: true,
     },
   },
+  password : {
+    type: DataTypes.STRING,
+    allowNull: false,
+   },
   phone_no: {
     type: DataTypes.STRING(15),
     allowNull: false,
@@ -45,7 +52,7 @@ const Employee = sequelize.define("Employee", {
     allowNull: false,
   },
   designation: {
-    type: DataTypes.STRING(100),
+    type: DataTypes.UUID,
     allowNull: false,
   },
   address1: {
@@ -74,17 +81,43 @@ const Employee = sequelize.define("Employee", {
     allowNull: false,
   },
   division: {
-    type: DataTypes.STRING(100),
+    type: DataTypes.UUID,
     allowNull: false,
+    references : {
+      model : Role,
+      key : "role_id"
+    }
   },
   department: {
-    type: DataTypes.STRING(100),
+    type: DataTypes.UUID,
     allowNull: false,
+    references : {
+      model : Department,
+      key : "dept_id"
+    }
   },
   branch: {
-    type: DataTypes.STRING(100),
+    type: DataTypes.UUID,
     allowNull: false,
+    references : {
+      model : Location,
+      key : "location_id"
+    }
   },
+  asset_allocation : {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references : {
+      model : Asset,
+      key : "asset_id"
+    }
+  },
+  is_active : {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue : true
+  }
+
 }, {
   tableName: "employees",
   timestamps: true, // adds createdAt & updatedAt

@@ -10,7 +10,7 @@ import {
   import {
     createEmployeeSchema ,updateEmployeeSchema,getEmployeeByIdSchema,deleteEmployeeSchema  
   } from "./employee.zod.js";
-  import { validate } from "../middleware/validate.js";
+  import { validate } from "../../shared/middleware/validate.js";
 
 router.post("/addEmployee", validate(createEmployeeSchema),addEmployee);
 router.get("/getEmployee", getEmployee);
