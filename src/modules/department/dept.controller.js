@@ -1,4 +1,3 @@
-// 
 import Department from "./dept.model.js"; // Sequelize model for department
 import { ValidationError, UniqueConstraintError } from "sequelize";
 
@@ -75,7 +74,7 @@ export const getDeptById = async (req, res) => {
 
     const dept = await Department.findOne({
       where: { dept_id:req.params.id }, // optionally add is_active: true
-      attributes: ['dept_name']
+      // attributes: ['dept_name']
     });
 
     if (!dept) {
@@ -110,17 +109,37 @@ export const updateDept = async (req, res) => {
   }
 };
 
+// export const deleteDept = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const [updated] = await Department.update(
+//       { is_active: false },
+//       { where: { dept_id: id, is_active: true } }
+//     );
+
+//     if (updated === 0) {
+//       return res.status(404).json({ message: "Department not found or already inactive" });
+//     }
+
+//     return res.status(200).json({ message: "Department soft deleted successfully" });
+//   } catch (error) {
+//     console.error("Error:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
+
 export const deleteDept = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [updated] = await Department.update(
-      { is_active: false },
-      { where: { dept_id: id, is_active: true } }
-    );
+    // Soft delete (because paranoid:true is set in model)
+    const deleted = await Department.destroy({
+      where: { dept_id: id }
+    });
 
-    if (updated === 0) {
-      return res.status(404).json({ message: "Department not found or already inactive" });
+    if (deleted === 0) {
+      return res.status(404).json({ message: "Department not found or already deleted" });
     }
 
     return res.status(200).json({ message: "Department soft deleted successfully" });

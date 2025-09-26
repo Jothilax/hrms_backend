@@ -102,17 +102,40 @@ export const updateRole = async (req, res) => {
 };
 
 // ✅ Delete Role (soft delete)
+// export const deleteRole = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const [updated] = await Role.update(
+//       { is_active: false },
+//       { where: { role_id: id, is_active: true } }
+//     );
+
+//     if (updated === 0) {
+//       return res.status(404).json({ message: "Role not found or already inactive" });
+//     }
+
+//     return res.status(200).json({ message: "Role soft deleted successfully" });
+//   } catch (error) {
+//     console.error("Error:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
+
+
 export const deleteRole = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [updated] = await Role.update(
-      { is_active: false },
-      { where: { role_id: id, is_active: true } }
-    );
+    // Soft delete (paranoid: true ensures it only sets deletedAt, not physical delete)
+    const deleted = await Role.destroy({
+      where: { role_id: id }
+    });
 
-    if (updated === 0) {
-      return res.status(404).json({ message: "Role not found or already inactive" });
+    if (deleted === 0) {
+      return res
+        .status(404)
+        .json({ message: "Role not found or already deleted" });
     }
 
     return res.status(200).json({ message: "Role soft deleted successfully" });

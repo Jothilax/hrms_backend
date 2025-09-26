@@ -1,4 +1,4 @@
-import Location from "./location.model.js";
+import Location from "./branch.model.js";
 import { z } from "zod";
 import { UniqueConstraintError } from "sequelize";
 
@@ -9,7 +9,7 @@ export const createLocation = async (req, res) => {
     const newLocation = await Location.create(req.body);
 
     res.status(201).json({
-      message: "Location added successfully",
+      message: "Branch added successfully",
       data: newLocation,
     });
   } catch (error) {
@@ -17,7 +17,7 @@ export const createLocation = async (req, res) => {
 
     if (error instanceof UniqueConstraintError) {
       return res.status(400).json({
-        message: "Duplicate entry. Location name or code already exists.",
+        message: "Duplicate entry. Branch name already exists.",
       });
     }
 
@@ -43,7 +43,7 @@ export const getAllLocations = async (req, res) => {
 
     if (search) {
       where[Op.or] = [
-        { location_name: { [Op.like]: `%${search}%` } },
+        { branch_name: { [Op.like]: `%${search}%` } },
         { created_by: { [Op.like]: `%${search}%` } },
         { updated_by: { [Op.like]: `%${search}%` } },
       ];
@@ -62,14 +62,14 @@ export const getAllLocations = async (req, res) => {
     const count = await Location.count({ where });
 
     return res.status(200).json({
-      message: "Locations fetched successfully",
+      message: "Branch fetched successfully",
       rows,
       count,
     });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({
-      message: "Failed to fetch locations",
+      message: "Failed to fetch Branch",
       error: error.message,
     });
   }
@@ -82,11 +82,11 @@ export const getLocation = async (req, res) => {
     const location = await Location.findByPk(id);
 
     if (!location) {
-      return res.status(404).json({ message: "Location not found" });
+      return res.status(404).json({ message: "Branch not found" });
     }
 
     return res.status(200).json({
-      message: "Location fetched successfully",
+      message: "Branch fetched successfully",
       data: location,
     });
   } catch (error) {
@@ -101,13 +101,13 @@ export const updateLocation = async (req, res) => {
     const { id } = req.params;
     const validatedData = req.body; // already validated by validate.js
 
-    const [updated] = await Location.update(validatedData, { where: { location_id: id } });
+    const [updated] = await Location.update(validatedData, { where: { branch_id: id } });
 
     if (updated === 0) {
-      return res.status(404).json({ message: "Location not found" });
+      return res.status(404).json({ message: "Branch not found" });
     }
 
-    return res.status(200).json({ message: "Location updated successfully" });
+    return res.status(200).json({ message: "Branch updated successfully" });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -115,20 +115,39 @@ export const updateLocation = async (req, res) => {
 };
 
 // ✅ Delete Location (soft delete)
+// export const deleteLocation = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const [updated] = await Location.update(
+//       { is_active: false },
+//       { where: { branch_id: id, is_active: true } }
+//     );
+
+//     if (updated === 0) {
+//       return res.status(404).json({ message: "Branch not found or already inactive" });
+//     }
+
+//     return res.status(200).json({ message: "Branch soft deleted successfully" });
+//   } catch (error) {
+//     console.error("Error:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
+
 export const deleteLocation = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [updated] = await Location.update(
-      { is_active: false },
-      { where: { location_id: id, is_active: true } }
-    );
+    const branch = await Location.findOne({ where: { branch_id: id } });
 
-    if (updated === 0) {
-      return res.status(404).json({ message: "Location not found or already inactive" });
+    if (!branch) {
+      return res.status(404).json({ message: "Branch not found" });
     }
 
-    return res.status(200).json({ message: "Location soft deleted successfully" });
+    await branch.destroy(); // 👈 Paranoid soft delete (sets deletedAt instead of hard delete)
+
+    return res.status(200).json({ message: "Branch soft deleted successfully" });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ message: "Internal server error" });

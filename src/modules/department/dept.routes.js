@@ -8,7 +8,7 @@ import {
   getDeptById,
   updateDept,
   deleteDept,
-} from "../dept/dept.controller.js";
+} from "./dept.controller.js";
 
 // ✅ Zod Schemas
 import {

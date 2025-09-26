@@ -1,8 +1,7 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../../db/connectToDb.js";
-import { v4 as uuidv4 } from "uuid";
+import { hrms } from "../../db/connectToDb.js";
 
-const Dept = sequelize.define('dept', {
+const Department = hrms.define('dept', {
     dept_id: {
         type: DataTypes.UUID,
         defaultValue:DataTypes.UUIDV4,
@@ -12,6 +11,24 @@ const Dept = sequelize.define('dept', {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
+    },
+     dept_ph: {
+        type: DataTypes.BIGINT,
+      allowNull: false,
+      validate: {
+        isNumeric: true,
+      },
+       
+    },
+    dept_email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+       
+    },
+    dept_description: {
+        type: DataTypes.STRING,
+        allowNull: false,
+       
     },
     is_active: {
         type: DataTypes.BOOLEAN,
@@ -28,7 +45,8 @@ const Dept = sequelize.define('dept', {
     }
 }, {
     tableName: 'department',
-    timestamps: true  
+    timestamps: true  ,
+    paranoid : true
 });
 
-export default Dept;
+export default Department;
