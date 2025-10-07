@@ -81,6 +81,7 @@ import DivisionRoutes from "./src/modules/division/division.route.js";
 import EmployeeRoute from "./src/modules/employee/employee.route.js";
 import EmployeeDetailsRoute from "./src/modules/employeeDetails/employeeDetails.route.js";
 import PersonnelEmployee from "./src/modules/xtown/personnelEmployee.model.js";
+import EmployeeEducationRoute from "./src/modules/education/empEducation.route.js";
 
 const app = express();
 dotenv.config();
@@ -96,6 +97,7 @@ app.use("/api/branch", BranchRoutes);
 app.use("/api/division", DivisionRoutes);
 app.use("/api/employee", EmployeeRoute);
 app.use("/api/employeeDetails", EmployeeDetailsRoute);
+app.use("/api/employeeEducation", EmployeeEducationRoute);
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
@@ -120,7 +122,7 @@ app.listen(port, async () => {
     // console.log("✅ Connected to attendance DB");
 
     // Sync both DBs without altering tables
-    await hrms.sync({ alter : true }).then("Connected hrms").catch("Error hrms");
+    await hrms.sync().then("Connected hrms").catch("Error hrms");
     await xtown.sync().then("Connected xtown").catch("Error xtown");
 
     console.log(`🚀 Server running on port ${port}`);
